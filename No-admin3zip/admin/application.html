@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Applications - Admin</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="admin.css">
+    <script type="module" src="auth-guard.js"></script>
+</head>
+<body>
+    <nav>
+        <h1>Admin Panel</h1>
+        <button id="logoutBtn">Logout</button>
+    </nav>
+    <main>
+        <h2>Rental Applications</h2>
+        <div id="applications-list">
+            <!-- Applications will be loaded here -->
+        </div>
+    </main>
+    <script type="module" src="auth-guard.js"></script>
+    <script type="module" src="admin.js"></script>
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        const supabaseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? localStorage.getItem('SUPABASE_URL') : '__SUPABASE_URL__';
+        const supabaseKey = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? localStorage.getItem('SUPABASE_ANON_KEY') : '__SUPABASE_ANON_KEY__';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>

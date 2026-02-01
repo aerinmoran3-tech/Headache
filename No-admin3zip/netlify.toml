@@ -1,0 +1,13 @@
+# Netlify Build Configuration
+[build]
+  publish = "No admin/public"
+  command = "sed -i \"s|__SUPABASE_URL__|${SUPABASE_URL}|g\" No admin/public/index.html No admin/public/admin/*.js && sed -i \"s|__SUPABASE_ANON_KEY__|${SUPABASE_ANON_KEY}|g\" No admin/public/index.html No admin/public/admin/*.js"
+
+[build.environment]
+  SUPABASE_URL = "/* SET_IN_NETLIFY_UI */"
+  SUPABASE_ANON_KEY = "/* SET_IN_NETLIFY_UI */"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choice Properties - Enhanced Rental Application</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="confidential-stamp">
+                <i class="fas fa-lock"></i> CONFIDENTIAL & SECURE
+            </div>
+            <div class="logo">
+                <i class="fas fa-building"></i>
+                <div class="logo-text">Choice Properties</div>
+            </div>
+            <div class="tagline">Professional Property Management Solutions</div>
+            <div class="trust-indicator" style="margin-top: 15px; font-size: 13px; display: flex; align-items: center; gap: 8px; opacity: 0.9;">
+                <i class="fas fa-shield-alt" title="Secure Connection"></i>
+                <span data-i18n="trustText">Applications are processed securely using industry-standard practices.</span>
+            </div>
+            <div class="time-estimate">
+                <i class="fas fa-clock"></i> <span data-i18n="timeEstimate">Estimated time: 15-20 minutes</span>
+            </div>
+            <div class="language-toggle" style="margin-top: 15px; display: flex; gap: 10px; align-items: center;">
+                <button type="button" id="langToggle" style="background: rgba(255,255,255,0.2); color: white; padding: 5px 12px; font-size: 12px; border: 1px solid rgba(255,255,255,0.3);">
+                    <i class="fas fa-language"></i> <span id="langText">Español</span>
+                </button>
+                <a href="/dashboard/index.html" id="dashboardLink" style="color: white; font-size: 12px; text-decoration: none; opacity: 0.8; border: 1px solid rgba(255,255,255,0.3); padding: 5px 12px;">
+                    <i class="fas fa-user-circle"></i> <span data-i18n="viewDashboard">View Dashboard</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+                <div class="progress-step completed" id="step1">
+                    <div class="step-number">1</div>
+                    <div class="step-label" data-i18n="propertyHeader">Property & Applicant</div>
+                </div>
+                <div class="progress-step active" id="step2">
+                    <div class="step-number">2</div>
+                    <div class="step-label" data-i18n="residencyHeader">Residency & Occupancy</div>
+                </div>
+                <div class="progress-step" id="step3">
+                    <div class="step-number">3</div>
+                    <div class="step-label" data-i18n="employmentHeader">Employment & Income</div>
+                </div>
+                <div class="progress-step" id="step4">
+                    <div class="step-number">4</div>
+                    <div class="step-label" data-i18n="financialHeader">Financial & References</div>
+                </div>
+                <div class="progress-step" id="step5">
+                    <div class="step-number">5</div>
+                    <div class="step-label" data-i18n="reviewHeader">Review & Submit</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submission Progress State -->
+        <div class="submission-progress" id="submissionProgress">
+            <div class="progress-steps">
+                <div class="progress-step-indicator">
+                    <div class="step-indicator active" id="step1Indicator">1</div>
+                    <div data-i18n="processing">Processing</div>
+                </div>
+                <div class="progress-step-indicator">
+                    <div class="step-indicator" id="step2Indicator">2</div>
+                    <div data-i18n="validating">Validating</div>
+                </div>
+                <div class="progress-step-indicator">
+                    <div class="step-indicator" id="step3Indicator">3</div>
+                    <div data-i18n="submittingStep">Submitting</div>
+                </div>
+                <div class="progress-step-indicator">
+                    <div class="step-indicator" id="step4Indicator">4</div>
+                    <div data-i18n="complete">Complete</div>
+                </div>
+            </div>
+            <h3><i class="fas fa-spinner fa-spin pulse"></i> <span data-i18n="submissionTitle">Submitting Your Application</span></h3>
+            <p id="submissionMessage" data-i18n="submissionHint">Please don't close this window. This may take a few moments...</p>
+        </div>
+
+        <!-- Success State -->
+        <div class="success-state" id="successState">
+            <i class="fas fa-check-circle"></i>
+            <h2 data-i18n="successTitle">Application Submitted Successfully!</h2>
+            <p data-i18n="successText">Thank you for choosing Choice Properties. Your application has been received and is being processed.</p>
+            
+            <div style="background: var(--light); padding: 20px; border-radius: 12px; margin: 25px 0; border: 1px solid #eee;">
+                <div class="application-id" style="margin: 0 0 15px 0; display: block;">
+                    <span data-i18n="appId" style="color: #7f8c8d; font-size: 14px; text-transform: uppercase;">Application ID</span>
+                    <div id="successAppId" style="color: var(--primary); font-size: 32px; font-weight: 800; letter-spacing: 2px; margin-top: 5px;">CP-XXXXXX</div>
+                </div>
+                
+                <div id="qr-section" style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding-top: 15px; border-top: 1px dashed #ddd;">
+                    <div id="qrcode" style="padding: 10px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
+                    <p style="font-size: 13px; color: var(--text-muted); font-weight: 500;" data-i18n="qrHint">Scan to bookmark your dashboard</p>
+                </div>
+            </div>
+
+            <div class="next-steps-card">
+                <h4 data-i18n="whatNext"><i class="fas fa-list-ul"></i> Important Next Steps</h4>
+                
+                <div class="next-step-item">
+                    <div class="step-icon-circle">1</div>
+                    <div>
+                        <strong data-i18n="emailStepTitle">Check Your Email</strong>
+                        <p style="font-size: 14px; color: #666; margin-top: 4px;" data-i18n="emailStepDesc">We've sent a confirmation and payment instructions to your inbox.</p>
+                    </div>
+                </div>
+
+                <div class="next-step-item">
+                    <div class="step-icon-circle">2</div>
+                    <div>
+                        <strong data-i18n="paymentStepTitle">Complete $50 Application Fee</strong>
+                        <p style="font-size: 14px; color: #666; margin-top: 4px;" data-i18n="paymentStepDesc">Review will begin once the non-refundable fee is confirmed by management.</p>
+                    </div>
+                </div>
+
+                <div class="next-step-item">
+                    <div class="step-icon-circle">3</div>
+                    <div>
+                        <strong data-i18n="reviewStepTitle">Verification Period</strong>
+                        <p style="font-size: 14px; color: #666; margin-top: 4px;" data-i18n="reviewStepDesc">Please allow 2-3 business days for our team to process your background check.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center;">
+                <button class="btn-submit" onclick="window.print()" style="background: var(--dark); flex: 1; max-width: 200px;">
+                    <i class="fas fa-print"></i> <span data-i18n="printBtn">Print Summary</span>
+                </button>
+                <button class="btn-next" onclick="location.reload()" style="flex: 1; max-width: 200px;">
+                    <i class="fas fa-plus"></i> <span data-i18n="newBtn">New Application</span>
+                </button>
+            </div>
+        </div>
+        
+        <form id="rentalApplication" enctype="multipart/form-data">
+            <input type="hidden" name="Application ID" id="formApplicationId">
+            
+            <!-- Step 1: Property & Applicant Details -->
+            <div class="form-section active" id="section1">
+                <h2><i class="fas fa-home"></i> Property & Applicant Details</h2>
+                
+                <div class="required-note"><i class="fas fa-info-circle"></i> <span data-i18n="requiredNote">Fields marked with * are required</span></div>
+                
+                <h3 data-i18n="propertyInfo">Property Information</h3>
+                <div class="form-group">
+                    <label class="required" for="propertyAddress" data-i18n="propertyAddressLabel">Property Address Applying For</label>
+                    <input type="text" id="propertyAddress" name="Property Address" required placeholder="Street address, city, state, zip">
+                    <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Please enter the property address</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="requestedMoveIn" data-i18n="moveInLabel">Requested Move-in Date</label>
+                            <input type="date" id="requestedMoveIn" name="Requested Move-in Date" required>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="desiredLeaseTerm" data-i18n="leaseTermLabel">Desired Lease Term</label>
+                            <select id="desiredLeaseTerm" name="Desired Lease Term" required>
+                                <option value="" data-i18n="selectTerm">Select term...</option>
+                                <option value="6 months" data-i18n="months6">6 Months</option>
+                                <option value="12 months" data-i18n="months12">12 Months (Standard)</option>
+                                <option value="18 months" data-i18n="months18">18 Months</option>
+                                <option value="24 months" data-i18n="months24">24 Months</option>
+                                <option value="Month-to-month" data-i18n="monthToMonth">Month-to-month</option>
+                            </select>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 data-i18n="primaryApplicantInfo">Primary Applicant Information</h3>
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="firstName" data-i18n="firstNameLabel">First Name</label>
+                            <input type="text" id="firstName" name="First Name" required>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="lastName" data-i18n="lastNameLabel">Last Name</label>
+                            <input type="text" id="lastName" name="Last Name" required>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="email" data-i18n="emailLabel">Email Address</label>
+                            <input type="email" id="email" name="Email" required placeholder="email@example.com">
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Invalid email</div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="phone" data-i18n="phoneLabel">Phone Number</label>
+                            <input type="tel" id="phone" name="Phone" required placeholder="(555) 000-0000">
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Invalid phone</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="dob" data-i18n="dobLabel">Date of Birth</label>
+                            <input type="date" id="dob" name="DOB" required>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="ssn" data-i18n="ssnLabel">Social Security Number (Optional)</label>
+                            <div class="field-hint" style="font-size: 11px; color: var(--success); margin-bottom: 5px;">
+                                <i class="fas fa-lock"></i> <span data-i18n="ssnHint">Encrypted during transmission and stored securely</span>
+                            </div>
+                            <div class="ssn-container">
+                                <input type="password" id="ssn" name="SSN" placeholder="XXX-XX-XXXX">
+                                <button type="button" class="ssn-toggle" id="ssnToggle" title="Toggle Visibility"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div class="field-hint" data-i18n="ssnDetailHint">Providing your SSN may help speed up identity and background verification when required by the property manager.</div>
+                            <div class="field-hint" style="font-size: 10px; color: #999; margin-top: 5px;" data-i18n="ssnPrivacyHint">SSN is encrypted and only accessible to authorized reviewers. We do not share this information without legal or screening requirements.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-container">
+                    <div></div>
+                    <button type="button" class="btn-next"><span data-i18n="nextStep">Next Step</span> <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Residency & Occupancy -->
+            <div class="form-section" id="section2">
+                <h2><i class="fas fa-map-marker-alt"></i> Residency & Occupancy</h2>
+                
+                <h3>Current Residence</h3>
+                <div class="form-group">
+                    <label class="required" for="currentAddress">Current Address</label>
+                    <input type="text" id="currentAddress" name="Current Address" required placeholder="Street, Unit #, City, State, Zip">
+                    <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="residencyStart">How long at this address?</label>
+                            <input type="text" id="residencyStart" name="Residency Duration" required placeholder="e.g., 2 years 3 months">
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="rentAmount">Current Rent/Mortgage Amount</label>
+                            <input type="text" id="rentAmount" name="Current Rent Amount" required placeholder="$">
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="required" for="reasonLeaving">Reason for leaving</label>
+                    <textarea id="reasonLeaving" name="Reason for leaving" required rows="2"></textarea>
+                    <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="landlordName">Current Landlord Name</label>
+                            <input type="text" id="landlordName" name="Current Landlord Name" required>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="landlordPhone">Landlord Phone</label>
+                            <input type="tel" id="landlordPhone" name="Landlord Phone" required>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>Occupants & Pets</h3>
+                <div class="form-group">
+                    <label for="totalOccupants">Number of total occupants (including children)</label>
+                    <input type="number" id="totalOccupants" name="Total Occupants" min="1" value="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="occupantNames">Names and ages of all other occupants</label>
+                    <textarea id="occupantNames" name="Additional Occupants" rows="2" placeholder="List names and ages..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Do you have any pets?</label>
+                    <div class="checkbox-group">
+                        <input type="radio" id="petsYes" name="Has Pets" value="Yes">
+                        <label for="petsYes">Yes</label>
+                        <input type="radio" id="petsNo" name="Has Pets" value="No" checked>
+                        <label for="petsNo">No</label>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="petDetailsGroup" style="display: none;">
+                    <label for="petDetails">Pet details (type, breed, weight)</label>
+                    <textarea id="petDetails" name="Pet Details" rows="2" placeholder="Describe your pets..."></textarea>
+                </div>
+                
+                <div class="btn-container">
+                    <button type="button" class="btn-prev"><i class="fas fa-arrow-left"></i> Previous</button>
+                    <button type="button" class="btn-next">Next Step <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Employment & Income -->
+            <div class="form-section" id="section3">
+                <h2><i class="fas fa-briefcase"></i> Employment & Income</h2>
+                
+                <h3 data-i18n="currentEmployment">Current Employment</h3>
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="employmentStatus" data-i18n="employmentStatusLabel">Employment Status</label>
+                            <select id="employmentStatus" name="Employment Status" required>
+                                <option value="" data-i18n="selectStatus">Select status...</option>
+                                <option value="Full-time" data-i18n="fullTime">Full-time</option>
+                                <option value="Part-time" data-i18n="partTime">Part-time</option>
+                                <option value="Self-employed" data-i18n="selfEmployed">Self-employed</option>
+                                <option value="Student" data-i18n="student">Student</option>
+                                <option value="Retired" data-i18n="retired">Retired</option>
+                                <option value="Unemployed" data-i18n="unemployed">Unemployed</option>
+                            </select>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="employer" data-i18n="employerLabel">Current Employer</label>
+                            <input type="text" id="employer" name="Employer" required>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="jobTitle" data-i18n="jobTitleLabel">Job Title</label>
+                            <input type="text" id="jobTitle" name="Job Title" required>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="employmentDuration" data-i18n="employmentDurationLabel">How long at this job?</label>
+                            <input type="text" id="employmentDuration" name="Employment Duration" required placeholder="e.g., 3 years">
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="supervisorName" data-i18n="supervisorNameLabel">Supervisor Name</label>
+                            <input type="text" id="supervisorName" name="Supervisor Name" required>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="supervisorPhone" data-i18n="supervisorPhoneLabel">Supervisor Phone</label>
+                            <input type="tel" id="supervisorPhone" name="Supervisor Phone" required>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 data-i18n="incomeVerification">Income Verification</h3>
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="monthlyIncome" data-i18n="monthlyIncomeLabel">Gross Monthly Income</label>
+                            <input type="text" id="monthlyIncome" name="Monthly Income" required placeholder="$">
+                            <div class="field-hint" data-i18n="incomeHint">Before taxes and deductions</div>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="otherIncome" data-i18n="otherIncomeLabel">Other Monthly Income</label>
+                            <input type="text" id="otherIncome" name="Other Income" placeholder="$">
+                            <div class="field-hint" data-i18n="otherIncomeHint">Child support, disability, etc.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="incomeRatioResult" class="income-ratio" style="display: none;">
+                    <div class="income-ratio-label">Income-to-Rent Ratio Estimation:</div>
+                    <div class="income-ratio-value" id="ratioDisplay">0x</div>
+                    <div class="field-hint">Most properties require 2.5x to 3x income relative to rent</div>
+                </div>
+                
+                <div class="btn-container">
+                    <button type="button" class="btn-prev"><i class="fas fa-arrow-left"></i> Previous</button>
+                    <button type="button" class="btn-next">Next Step <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+            
+            <!-- Step 4: Financial & References -->
+            <div class="form-section" id="section4">
+                <h2><i class="fas fa-list-ul"></i> Financial & References</h2>
+                
+                <h3 data-i18n="personalReferences">Personal References</h3>
+                <p class="field-hint" data-i18n="referencesHint">Please provide two references not related to you</p>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="ref1Name" data-i18n="ref1NameLabel">Reference 1 Name (Required)</label>
+                            <input type="text" id="ref1Name" name="Reference 1 Name" required>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="ref1Phone" data-i18n="ref1PhoneLabel">Reference 1 Phone (Required)</label>
+                            <input type="tel" id="ref1Phone" name="Reference 1 Phone" required>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="ref2Name" data-i18n="ref2NameLabel">Reference 2 Name (Optional)</label>
+                            <input type="text" id="ref2Name" name="Reference 2 Name">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="ref2Phone">Reference 2 Phone (Optional)</label>
+                            <input type="tel" id="ref2Phone" name="Reference 2 Phone">
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>Emergency Contact</h3>
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="emergencyName">Name</label>
+                            <input type="text" id="emergencyName" name="Emergency Contact Name" required>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="required" for="emergencyPhone">Phone Number</label>
+                            <input type="tel" id="emergencyPhone" name="Emergency Contact Phone" required>
+                            <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 data-i18n="genInfo">General Information</h3>
+                <div class="form-group">
+                    <label data-i18n="evictedLabel">Have you ever been evicted?</label>
+                    <div class="checkbox-group">
+                        <input type="radio" id="evictedYes" name="Ever Evicted" value="Yes">
+                        <label for="evictedYes" data-i18n="yes">Yes</label>
+                        <input type="radio" id="evictedNo" name="Ever Evicted" value="No" checked>
+                        <label for="evictedNo" data-i18n="no">No</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label data-i18n="smokeLabel">Do you smoke?</label>
+                    <div class="checkbox-group">
+                        <input type="radio" id="smokeYes" name="Smoker" value="Yes">
+                        <label for="smokeYes" data-i18n="yes">Yes</label>
+                        <input type="radio" id="smokeNo" name="Smoker" value="No" checked>
+                        <label for="smokeNo" data-i18n="no">No</label>
+                    </div>
+                </div>
+                
+                <div class="btn-container">
+                    <button type="button" class="btn-prev"><i class="fas fa-arrow-left"></i> Previous</button>
+                    <button type="button" class="btn-next">Next Step <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+            
+            <!-- Step 5: Review & Submit -->
+            <div class="form-section" id="section5">
+                <h2><i class="fas fa-check-double"></i> Review & Submit</h2>
+                
+                <div class="privacy-note" style="border-left-color: var(--accent); background: #fff8f1; margin-bottom: 25px;">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--accent); font-size: 1.2rem; margin-right: 10px;"></i>
+                    <div style="display: inline-block; vertical-align: top; width: calc(100% - 40px);">
+                        <strong style="color: var(--dark); display: block; margin-bottom: 5px;" data-i18n="reviewWarningTitle">Please Review Carefully</strong>
+                        <p style="font-size: 0.9rem; color: #666;" data-i18n="reviewWarningDesc">Ensure all information is accurate. Incorrect details may lead to delays or denial of your application. You can click "Edit" on any section below to make changes.</p>
+                    </div>
+                </div>
+
+                <div class="summary-section">
+                    <h3>Application Summary</h3>
+                    <div class="application-fee-display" style="background: #eef7ee; padding: 15px; border-radius: 8px; border-left: 4px solid var(--success); margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: bold; color: var(--dark);">Application Fee:</span>
+                            <span style="font-size: 20px; font-weight: 800; color: var(--success);">$50.00</span>
+                        </div>
+                        <p style="font-size: 12px; color: #666; margin-top: 8px;">Application fee is a non-refundable $50 and is required before your application can be reviewed.</p>
+                    </div>
+                    
+                    <div class="next-steps-timeline" style="margin-bottom: 25px; padding: 15px; background: #fff; border: 1px solid #eee; border-radius: 8px;">
+                        <h4 style="margin-bottom: 15px; color: var(--primary); font-size: 14px;"><i class="fas fa-tasks"></i> Next Steps Timeline</h4>
+                        <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                                <span><strong>Step 1:</strong> Submission & Confirmation Email (Instant)</span>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <i class="far fa-circle" style="color: #ccc;"></i>
+                                <span><strong>Step 2:</strong> Manager Review (2-3 Business Days)</span>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <i class="far fa-circle" style="color: #ccc;"></i>
+                                <span><strong>Step 3:</strong> Background & Credit Check (If Required)</span>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <i class="far fa-circle" style="color: #ccc;"></i>
+                                <span><strong>Step 4:</strong> Final Approval & Lease Signature</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="applicationSummary">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <h3>Document Upload (Optional)</h3>
+                <div class="document-upload-section">
+                    <div class="file-upload" id="dropZone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p><strong>Click to upload</strong> or drag and drop</p>
+                        <p class="field-hint">Pay stubs, ID, or other supporting documents (Max 10MB total)</p>
+                        <input type="file" id="fileInput" multiple style="display: none;">
+                    </div>
+                    <div class="file-list" id="fileList"></div>
+                    <div class="file-upload-progress" id="uploadProgress">
+                        <div class="file-upload-progress-bar" id="uploadProgressBar"></div>
+                    </div>
+                </div>
+                
+                <div class="legal-section">
+                    <h3>Legal Declaration</h3>
+                    <div class="privacy-note">
+                        <p>I certify that the information provided in this application is true and correct to the best of my knowledge. I understand that any false statements may be grounds for rejection of this application or termination of any subsequent lease agreement.</p>
+                        <p style="margin-top: 10px;">I authorize Choice Properties to verify the information provided, including credit history, employment, and references. Background checks may use industry-standard providers such as TransUnion or Experian where permitted.</p>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="termsAgree" name="Terms Agreement" required>
+                        <label class="required" for="termsAgree">I agree to the terms and conditions</label>
+                        <div class="error-message" style="display:none; color: var(--danger); font-size: 14px;">Required</div>
+                    </div>
+                </div>
+                
+                <div class="btn-container">
+                    <button type="button" class="btn-prev"><i class="fas fa-arrow-left"></i> Previous</button>
+                    <button type="submit" class="btn-submit" id="mainSubmitBtn">Submit Application <i class="fas fa-paper-plane"></i></button>
+                </div>
+                <p class="submit-disclaimer">By clicking submit, your application will be securely transmitted for review. You will receive an email confirmation shortly.</p>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="button" id="startOverBtn" style="background: none; border: none; color: var(--danger); font-size: 14px; cursor: pointer; text-decoration: underline; margin: 0 auto; display: block;">
+                        <i class="fas fa-undo"></i> Clear Application & Start Over
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Choice Properties Management. All rights reserved.</p>
+        <p>This is a secure application form powered by FormSubmit.</p>
+    </footer>
+
+    <div class="auto-save-indicator" id="autoSaveIndicator">
+        <i class="fas fa-save"></i> Progress Saved
+    </div>
+
+    <div class="offline-indicator" id="offlineIndicator">
+        <i class="fas fa-wifi-slash"></i> You are currently offline. Progress will be saved locally.
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
