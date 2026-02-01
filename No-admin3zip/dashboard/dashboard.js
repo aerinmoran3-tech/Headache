@@ -91,6 +91,8 @@ class ApplicantDashboard {
         try {
             this.elements.login.classList.add('hidden');
             this.elements.loading.classList.remove('hidden');
+            this.elements.loading.style.opacity = '0';
+            setTimeout(() => this.elements.loading.style.opacity = '1', 10);
             
             const { data: apps, error } = await this.supabaseClient
                 .from('rental_applications')
@@ -104,10 +106,12 @@ class ApplicantDashboard {
                 this.renderApplications(apps);
                 this.setupRealtime(userId);
             } else {
+                this.elements.loading.classList.add('hidden');
                 this.showError('No applications found for your account.');
             }
         } catch (err) {
             console.error(err);
+            this.elements.loading.classList.add('hidden');
             this.showError('An error occurred while fetching your applications.');
         }
     }

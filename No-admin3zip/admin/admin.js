@@ -83,7 +83,7 @@ if (appList) {
 
     async function loadApplications() {
         try {
-            appList.innerHTML = '<p>Loading applications...</p>';
+            appList.innerHTML = '<div class="state-container"><div class="loading-spinner"></div><p>Loading applications...</p></div>';
             const { data, error } = await supabase
                 .from('rental_applications')
                 .select('*')
