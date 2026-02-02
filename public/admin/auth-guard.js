@@ -4,9 +4,9 @@
  */
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-// These placeholders will be replaced by Netlify environment variables during build
-const supabaseUrl = '__SUPABASE_URL__';
-const supabaseKey = '__SUPABASE_ANON_KEY__';
+// Use runtime config from window.ENV
+const supabaseUrl = window.ENV?.SUPABASE_URL || '__SUPABASE_URL__';
+const supabaseKey = window.ENV?.SUPABASE_ANON_KEY || '__SUPABASE_ANON_KEY__';
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 

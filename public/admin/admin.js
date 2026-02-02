@@ -5,12 +5,12 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 import { STATUS } from '../js/status-map.js';
 
-// These placeholders will be replaced by Netlify environment variables during build
-const supabaseUrl = '__SUPABASE_URL__';
-const supabaseKey = '__SUPABASE_ANON_KEY__';
+// Use runtime config from window.ENV
+const supabaseUrl = window.ENV?.SUPABASE_URL || '__SUPABASE_URL__';
+const supabaseKey = window.ENV?.SUPABASE_ANON_KEY || '__SUPABASE_ANON_KEY__';
 
-if (!supabaseUrl.startsWith('http')) {
-    console.error('Supabase URL placeholder found. Ensure Netlify environment variables are set and build command is running.');
+if (!supabaseUrl || !supabaseUrl.startsWith('http')) {
+    console.error('Supabase URL not found in window.ENV. Ensure Vercel environment variables are set.');
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);

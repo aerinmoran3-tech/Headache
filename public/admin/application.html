@@ -6,6 +6,7 @@
     <title>Manage Applications - Admin</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="admin.css">
+    <script src="../js/config.js"></script>
     <script type="module" src="auth-guard.js"></script>
 </head>
 <body>
@@ -23,8 +24,8 @@
     <script type="module" src="admin.js"></script>
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-        const supabaseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? localStorage.getItem('SUPABASE_URL') : '__SUPABASE_URL__';
-        const supabaseKey = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? localStorage.getItem('SUPABASE_ANON_KEY') : '__SUPABASE_ANON_KEY__';
+        const supabaseUrl = window.ENV?.SUPABASE_URL || '__SUPABASE_URL__';
+        const supabaseKey = window.ENV?.SUPABASE_ANON_KEY || '__SUPABASE_ANON_KEY__';
         const supabase = createClient(supabaseUrl, supabaseKey);
         
         document.getElementById('logoutBtn').addEventListener('click', async () => {

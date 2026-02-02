@@ -27,12 +27,12 @@ class ApplicantDashboard {
     }
 
     initSupabase() {
-        // These placeholders will be replaced by Netlify environment variables during build
-        const URL = "__SUPABASE_URL__";
-        const KEY = "__SUPABASE_ANON_KEY__";
+        // Use runtime config from window.ENV
+        const URL = window.ENV?.SUPABASE_URL || "__SUPABASE_URL__";
+        const KEY = window.ENV?.SUPABASE_ANON_KEY || "__SUPABASE_ANON_KEY__";
 
-        if (!URL.startsWith('http')) {
-            console.error('Dashboard: Supabase URL placeholder found. Check Netlify build settings.');
+        if (!URL || !URL.startsWith('http')) {
+            console.error('Dashboard: Supabase URL not found in window.ENV.');
         }
 
         this.supabaseClient = supabase.createClient(URL, KEY);

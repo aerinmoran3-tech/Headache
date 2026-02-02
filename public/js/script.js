@@ -10,20 +10,19 @@ class RentalApplication {
             LOCAL_STORAGE_KEY: "choicePropertiesRentalApp",
             AUTO_SAVE_INTERVAL: 30000,
             MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
-            // These placeholders will be replaced by Netlify environment variables during build
-            SUPABASE_URL: "__SUPABASE_URL__",
-            SUPABASE_KEY: "__SUPABASE_ANON_KEY__"
+            SUPABASE_URL: window.ENV?.SUPABASE_URL || "__SUPABASE_URL__",
+            SUPABASE_KEY: window.ENV?.SUPABASE_ANON_KEY || "__SUPABASE_ANON_KEY__"
         };
         
         // Initialize Supabase if variables are available
         try {
-            if (this.config.SUPABASE_URL.startsWith('http')) {
+            if (this.config.SUPABASE_URL && this.config.SUPABASE_URL.startsWith('http')) {
                 if (typeof supabase !== 'undefined') {
                     this.supabase = supabase.createClient(this.config.SUPABASE_URL, this.config.SUPABASE_KEY);
                     console.log('Supabase client initialized successfully.');
                 }
             } else {
-                console.warn('Supabase credentials not yet injected. Application may be in build state or local development.');
+                console.warn('Supabase credentials not yet available in window.ENV.');
             }
         } catch (e) {
             console.error('Supabase initialization failed:', e);

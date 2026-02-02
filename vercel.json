@@ -4,6 +4,6 @@
     { "source": "/admin/:path*", "destination": "/admin/application.html" },
     { "source": "/dashboard", "destination": "/dashboard/index.html" },
     { "source": "/dashboard/:path*", "destination": "/dashboard/index.html" },
-    { "source": "/((?!api|admin|dashboard|_next/static|_next/image|favicon.ico).*)", "destination": "/index.html" }
+    { "source": "/((?!api|admin|dashboard|js|css|_next/static|_next/image|favicon.ico).*)", "destination": "/index.html" }
   ]
 }
