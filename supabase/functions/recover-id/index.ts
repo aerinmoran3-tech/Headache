@@ -36,7 +36,7 @@ serve(async (req) => {
       <h3>Hello / Hola,</h3>
       <p>You requested a recovery of your Application ID(s) for Choice Properties.</p>
       <ul>${appList}</ul>
-      <p>Use these IDs to check your status on the <a href="https://choiceproperties.replit.app/dashboard">Applicant Dashboard</a>.</p>
+      <p>Use these IDs to check your status on the <a href="https://choicepropertiesapplication.netlify.app/dashboard">Applicant Dashboard</a>.</p>
       <hr>
       <p><em>Choice Properties Management</em></p>
     `

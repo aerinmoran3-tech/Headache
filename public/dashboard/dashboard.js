@@ -27,12 +27,9 @@ class ApplicantDashboard {
     }
 
     initSupabase() {
-        const URL = window.location.hostname === 'localhost' || window.location.hostname === '0.0.0.0'
-            ? "https://fmdzxzbvmisnkygfpnty.supabase.co/" 
-            : (window.env?.SUPABASE_URL || "__SUPABASE_URL__");
-        const KEY = window.location.hostname === 'localhost' || window.location.hostname === '0.0.0.0'
-            ? "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtZHp4emJ2bWlzbmt5Z2ZwbnR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3Njg0NzksImV4cCI6MjA4NTM0NDQ3OX0.1pYqW72u_fL-p0zS6WwX0K7oG-W3k64pT7M0733xIAs"
-            : (window.env?.SUPABASE_ANON_KEY || "__SUPABASE_ANON_KEY__");
+        // These placeholders will be replaced by Netlify environment variables during build
+        const URL = "__SUPABASE_URL__";
+        const KEY = "__SUPABASE_ANON_KEY__";
 
         this.supabaseClient = supabase.createClient(URL, KEY);
     }

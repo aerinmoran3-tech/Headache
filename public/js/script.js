@@ -10,8 +10,9 @@ class RentalApplication {
             LOCAL_STORAGE_KEY: "choicePropertiesRentalApp",
             AUTO_SAVE_INTERVAL: 30000,
             MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
-            SUPABASE_URL: window.location.hostname === 'localhost' ? "https://vvbjdsgisjfgwcjlzneq.supabase.co" : (typeof process !== 'undefined' && process.env?.SUPABASE_URL) || "https://vvbjdsgisjfgwcjlzneq.supabase.co",
-            SUPABASE_KEY: (typeof process !== 'undefined' && process.env?.SUPABASE_ANON_KEY) || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2Ympkc2dpc2pmZ3djamx6bmVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4NzI5MTAsImV4cCI6MjA4NTQ0ODkxMH0.KAlxk8pX4gFcZjo8xCs0QkkMjmdOMm7NNRXDgkjKCGQ"
+            // These placeholders will be replaced by Netlify environment variables during build
+            SUPABASE_URL: "__SUPABASE_URL__",
+            SUPABASE_KEY: "__SUPABASE_ANON_KEY__"
         };
         
         // Initialize Supabase if variables are available
