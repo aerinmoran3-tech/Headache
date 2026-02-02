@@ -1,5 +1,6 @@
 [build]
   publish = "public"
+  command = "sed -i \"s|__SUPABASE_URL__|$SUPABASE_URL|g\" public/js/*.js public/admin/*.js public/dashboard/*.js && sed -i \"s|__SUPABASE_ANON_KEY__|$SUPABASE_ANON_KEY|g\" public/js/*.js public/admin/*.js public/dashboard/*.js"
 
 [[redirects]]
   from = "/admin"
