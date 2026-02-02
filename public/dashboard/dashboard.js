@@ -31,6 +31,10 @@ class ApplicantDashboard {
         const URL = "__SUPABASE_URL__";
         const KEY = "__SUPABASE_ANON_KEY__";
 
+        if (!URL.startsWith('http')) {
+            console.error('Dashboard: Supabase URL placeholder found. Check Netlify build settings.');
+        }
+
         this.supabaseClient = supabase.createClient(URL, KEY);
     }
 

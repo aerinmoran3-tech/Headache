@@ -17,11 +17,16 @@ class RentalApplication {
         
         // Initialize Supabase if variables are available
         try {
-            if (typeof supabase !== 'undefined') {
-                this.supabase = supabase.createClient(this.config.SUPABASE_URL, this.config.SUPABASE_KEY);
+            if (this.config.SUPABASE_URL.startsWith('http')) {
+                if (typeof supabase !== 'undefined') {
+                    this.supabase = supabase.createClient(this.config.SUPABASE_URL, this.config.SUPABASE_KEY);
+                    console.log('Supabase client initialized successfully.');
+                }
+            } else {
+                console.warn('Supabase credentials not yet injected. Application may be in build state or local development.');
             }
         } catch (e) {
-            // Silence initialization errors in production
+            console.error('Supabase initialization failed:', e);
         }
         
         this.state = {
